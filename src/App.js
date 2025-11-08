@@ -127,7 +127,8 @@ input:focus,select:focus,textarea:focus{border-color:#6aa1ff;box-shadow:0 0 0 3p
    Mock API (LocalStorage) + Real mailer base
    =================================================================== */
 const LS_KEY = "idea_market_db_v2";
-const EMAIL_BASE = "http://localhost:4000";
+const EMAIL_BASE = process.env.REACT_APP_EMAIL_BASE || "https://idea-match.onrender.com";
+
 
 const seedDB = () => ({
   users: [
