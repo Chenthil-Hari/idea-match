@@ -5,130 +5,13 @@ import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation, Navigate 
 /* ===================================================================
    Full CSS (paste your styling — this is the full CSS used previously)
    =================================================================== */
-const baseCss = `
-:root{ --bg:#070b13; --card:#121826; --ink:#e8eeff; --muted:#a7b6de; --accent:#7dd3fc; --accent2:#6aa1ff; --ok:#4ade80; --warn:#fbbf24; --danger:#fb7185; }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial}
-a{color:inherit;text-decoration:none}
-
-/* Animated background */
-.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;
-  background:linear-gradient(120deg,#070b13 0%, #0c1220 60%, #0b0e14 100%);
-}
-.bg::before,.bg::after{content:"";position:absolute;inset:-20%;
-  background:
-    radial-gradient(40% 25% at 15% 15%, #1b2b52aa 0%, transparent 60%),
-    radial-gradient(35% 22% at 85% 12%, #16376baa 0%, transparent 60%),
-    radial-gradient(35% 22% at 30% 90%, #4a1f4baa 0%, transparent 60%);
-  filter:blur(10px);
-  animation:floatbg 24s ease-in-out infinite alternate;
-}
-.bg::after{animation-duration:32s;opacity:.6;transform:scale(1.1)}
-@keyframes floatbg{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(-4%,3%,0)}100%{transform:translate3d(3%,-4%,0)}}
-
-/* Layout */
-.app{max-width:1200px;margin:0 auto;padding:24px}
-.grid{display:grid;gap:18px}
-.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-@media (max-width:900px){.cols-3{grid-template-columns:1fr}.cols-2{grid-template-columns:1fr}}
-.row{display:flex;gap:12px;flex-wrap:wrap}
-.right{margin-left:auto}
-.muted{color:var(--muted)}
-.spacer{height:8px}
-
-/* Navbar */
-.nav{display:flex;gap:16px;align-items:center;justify-content:space-between;
-  padding:16px 20px;border:1px solid rgba(255,255,255,.08);border-radius:16px;
-  background:rgba(10,14,22,.55);backdrop-filter:blur(12px);
-  box-shadow:0 8px 24px rgba(0,0,0,.35);position:sticky;top:16px}
-.nav a{opacity:.95}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.3px}
-.brand .dot{width:12px;height:12px;border-radius:999px;background:var(--accent2)}
-.navlinks{display:flex;gap:12px;flex-wrap:wrap}
-.search{min-width:260px}
-.search input{width:100%;padding:10px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
-  background:rgba(255,255,255,.06);color:var(--ink)}
-@media (max-width:900px){.search{min-width:unset;width:100%}.nav{gap:10px;flex-wrap:wrap}}
-
-/* Cards & tables */
-.card{border:1px solid rgba(255,255,255,.08);border-radius:18px;background:rgba(255,255,255,.06);
-  backdrop-filter:blur(14px);padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.35);
-  transition:transform .2s ease, box-shadow .2s ease, border-color .2s}
-.card:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(0,0,0,.45);border-color:rgba(255,255,255,.18)}
-.table{width:100%;border-collapse:collapse}
-.table th,.table td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.1)}
-
-/* Forms */
-input,select,textarea{width:100%;padding:10px 12px;border-radius:12px;
-  border:1px solid rgba(255,255,255,.08);background:rgba(9,13,21,.7);color:var(--ink);outline:none}
-textarea{min-height:110px;resize:vertical}
-input:focus,select:focus,textarea:focus{border-color:#6aa1ff;box-shadow:0 0 0 3px rgba(106,161,255,.2)}
-
-/* Buttons / pills */
-.btn{display:inline-flex;gap:8px;align-items:center;justify-content:center;padding:10px 14px;
-  border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(15,20,32,.7);
-  color:var(--ink);cursor:pointer;transition:transform .15s ease, box-shadow .15s ease}
-.btn:hover{transform:translateY(-1px)}
-.btn.primary{background:linear-gradient(135deg,#8ab6ff 0%, #6aa1ff 35%, #7dd3fc 100%);
-  border:0;color:#081226;font-weight:700;box-shadow:0 6px 20px rgba(106,161,255,.35)}
-.btn.primary:hover{box-shadow:0 10px 28px rgba(106,161,255,.45)}
-.btn.ghost{background:transparent}
-.pill{display:inline-flex;padding:6px 10px;border:1px solid rgba(255,255,255,.08);
-  border-radius:999px;font-size:12px;color:var(--muted);background:rgba(255,255,255,.06)}
-.price{font-weight:800}
-
-/* Hero & image cards */
-.hero{position:relative;border-radius:24px;overflow:hidden;min-height:380px;
-  background-image:url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop');
-  background-size:cover;background-position:center;box-shadow:0 30px 80px rgba(0,0,0,.35);}
-.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(7,11,19,.85),rgba(7,11,19,.35));}
-.hero-inner{position:relative;z-index:1;padding:48px}
-.hero h1{font-size:42px;margin:0 0 8px}
-.hero p{color:#cfe2ff;margin:0 0 18px}
-.hero-cta{display:flex;gap:10px;flex-wrap:wrap}
-.cat-card,.feat-card{overflow:hidden}
-.cat-thumb,.feat-thumb{border-radius:14px;overflow:hidden;aspect-ratio:16/10;background:#0c1220;background-size:cover;background-position:center}
-
-/* Footer */
-.footer{margin-top:28px;padding:24px;border:1px solid rgba(255,255,255,.08);border-radius:16px;
-  background:rgba(10,14,22,.55);backdrop-filter:blur(10px);display:grid;gap:12px;grid-template-columns:1fr 1fr 1fr}
-.footer small{color:var(--muted)}
-@media (max-width:900px){.footer{grid-template-columns:1fr}}
-
-/* Glam pack (extra effects for dashboard) */
-.gradient-text{background:linear-gradient(90deg,#7dd3fc 0%,#a78bfa 50%,#f472b6 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.glass-heavy{background:rgba(255,255,255,.08);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
-.tilt-card{transition:transform .25s ease, box-shadow .25s ease}
-.tilt-card:hover{transform:translateY(-6px) rotateX(3deg) rotateY(-3deg);box-shadow:0 24px 70px rgba(0,0,0,.45)}
-.float{animation:float 6s ease-in-out infinite}
-@keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
-.neon-btn{position:relative;isolation:isolate}
-.neon-btn::before{content:"";position:absolute;inset:-2px;border-radius:14px;background:conic-gradient(from 0deg,#7dd3fc,#a78bfa,#f472b6,#7dd3fc);filter:blur(10px);opacity:.6;z-index:-1}
-.neon-btn:hover::before{filter:blur(14px);opacity:.9}
-.sparkle-btn{position:relative;overflow:hidden}
-.sparkle-btn span.shimmer{position:absolute;inset:0;background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,.25) 40%,transparent 60%);transform:translateX(-120%);animation:shimmer 2.2s infinite}
-@keyframes shimmer{to{transform:translateX(120%)}}
-.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(125,211,252,.12);border:1px solid rgba(125,211,252,.35);color:#cfe7ff}
-.badge .dot{width:8px;height:8px;border-radius:999px;background:#7dd3fc;box-shadow:0 0 10px #7dd3fc}
-.wave{position:relative;border-radius:22px;overflow:hidden;background:linear-gradient(180deg,#0b1222 0%,#0a0f1a 100%);box-shadow:0 30px 80px rgba(0,0,0,.35)}
-.wave>svg{position:absolute;left:0;bottom:-1px;width:100%;height:120px;opacity:.7}
-.halo{position:absolute;inset:-30px;background:radial-gradient(600px 240px at 20% 20%,rgba(106,161,255,.18),transparent 60%),radial-gradient(400px 200px at 90% 10%,rgba(167,139,250,.22),transparent 60%),radial-gradient(420px 240px at 40% 90%,rgba(244,114,182,.14),transparent 60%);filter:saturate(1.1)}
-.avatar{width:56px;height:56px;border-radius:999px;position:relative;background:linear-gradient(135deg,#1f2937,#0b1222)}
-.avatar::after{content:"";position:absolute;inset:-3px;border-radius:999px;background:conic-gradient(#7dd3fc,#a78bfa,#f472b6,#7dd3fc);filter:blur(10px);opacity:.45;z-index:-1}
-.confetti{pointer-events:none;position:fixed;inset:0;overflow:hidden;z-index:9999}
-.confetti span{position:absolute;width:8px;height:14px;opacity:.9;animation:fall linear forwards}
-@keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:.95}}
-.tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:12px;color:#cfe2ff}
-.ok{color:var(--ok)} .warn{color:var(--warn)} .danger{color:var(--danger)}
-`;
+const baseCss = ` ...your existing CSS... `; // keep the same CSS string you had
 
 /* ===================================================================
    Mock API (LocalStorage) + Real mailer base
    =================================================================== */
 const LS_KEY = "idea_market_db_v2";
 const EMAIL_BASE = process.env.REACT_APP_EMAIL_BASE || "http://localhost:4000";
-
 
 const seedDB = () => ({
   users: [
@@ -349,6 +232,34 @@ function AuthProvider({ children }) {
    (These are lightweight copies of the components you used previously)
    =================================================================== */
 
+/* eslint-disable no-unused-vars */
+function FancyButton({ children, onClick, kind="primary" }) {
+  const base = "btn neon-btn sparkle-btn";
+  const cls = kind==="primary" ? base : base+" ghost";
+  return (
+    <button className={cls} onClick={onClick} style={{position:"relative"}}>
+      <span className="shimmer" />
+      {children}
+    </button>
+  );
+}
+
+function Section({ title, subtitle, right, children }) {
+  return (
+    <div className="card glass-heavy tilt-card" style={{marginTop:16}}>
+      <div className="row" style={{alignItems:"center"}}>
+        <div>
+          <h2 style={{margin:0}} className="gradient-text">{title}</h2>
+          {subtitle && <p className="muted" style={{margin:"4px 0 0"}}>{subtitle}</p>}
+        </div>
+        <span className="right"/>{right}
+      </div>
+      <div style={{marginTop:12}}>{children}</div>
+    </div>
+  );
+}
+/* eslint-enable no-unused-vars */
+
 function Nav() {
   const { account, setAccount } = useAuth();
   const nav = useNavigate();
@@ -391,32 +302,6 @@ function Hero(){
         </div>
       </div>
     </section>
-  );
-}
-
-function FancyButton({ children, onClick, kind="primary" }) {
-  const base = "btn neon-btn sparkle-btn";
-  const cls = kind==="primary" ? base : base+" ghost";
-  return (
-    <button className={cls} onClick={onClick} style={{position:"relative"}}>
-      <span className="shimmer" />
-      {children}
-    </button>
-  );
-}
-
-function Section({ title, subtitle, right, children }) {
-  return (
-    <div className="card glass-heavy tilt-card" style={{marginTop:16}}>
-      <div className="row" style={{alignItems:"center"}}>
-        <div>
-          <h2 style={{margin:0}} className="gradient-text">{title}</h2>
-          {subtitle && <p className="muted" style={{margin:"4px 0 0"}}>{subtitle}</p>}
-        </div>
-        <span className="right"/>{right}
-      </div>
-      <div style={{marginTop:12}}>{children}</div>
-    </div>
   );
 }
 
@@ -599,7 +484,7 @@ function SellerDashboard() {
     finally { setRejectingId(null); }
   };
 
-  const acceptedProjectIds = new Set(myInvites.filter(i=>i.status==="accepted").map(i=>i.projectId || i.projectId));
+  const acceptedProjectIds = new Set(myInvites.filter(i=>i.status==="accepted").map(i => i.projectId));
 
   return (
     <div style={{marginTop:16}} className="grid cols-2">
