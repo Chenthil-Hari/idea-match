@@ -323,6 +323,23 @@ app.get("/api/seller/:sellerId/invites", (req, res) => {
 
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 app.get("/api/test-email", (req, res) => res.json({ ok: true, msg: "server up" }));
+// Root route (fixes "Cannot GET /")
+app.get("/", (req, res) => {
+  res.send(`
+    <html>
+      <body style="font-family: ui-sans-serif; padding: 24px;">
+        <h2>IdeaMatch Mailer</h2>
+        <p>Mailer running at <b>${process.env.SERVER_URL || `http://localhost:${PORT}`}</b></p>
+        <ul>
+          <li><a href="/api/health">/api/health</a> — health check</li>
+          <li><a href="/api/test-email">/api/test-email</a> — test endpoint</li>
+        </ul>
+        <p>Use the <code>/api/</code> routes for invites, offers, accept/reject.</p>
+      </body>
+    </html>
+  `);
+});
+
 
 app.listen(PORT, () => {
   console.log(`📨 Mailer running at http://localhost:${PORT}`);
