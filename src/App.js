@@ -233,6 +233,7 @@ function AuthProvider({ children }) {
    =================================================================== */
 
 /* eslint-disable no-unused-vars */
+/* eslint-disable-next-line no-unused-vars */
 function FancyButton({ children, onClick, kind="primary" }) {
   const base = "btn neon-btn sparkle-btn";
   const cls = kind==="primary" ? base : base+" ghost";
@@ -244,20 +245,15 @@ function FancyButton({ children, onClick, kind="primary" }) {
   );
 }
 
+/* eslint-disable-next-line no-unused-vars */
 function Section({ title, subtitle, right, children }) {
   return (
     <div className="card glass-heavy tilt-card" style={{marginTop:16}}>
-      <div className="row" style={{alignItems:"center"}}>
-        <div>
-          <h2 style={{margin:0}} className="gradient-text">{title}</h2>
-          {subtitle && <p className="muted" style={{margin:"4px 0 0"}}>{subtitle}</p>}
-        </div>
-        <span className="right"/>{right}
-      </div>
-      <div style={{marginTop:12}}>{children}</div>
+      ...
     </div>
   );
 }
+
 /* eslint-enable no-unused-vars */
 
 function Nav() {
