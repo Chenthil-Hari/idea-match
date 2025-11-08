@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useEffect, useMemo, useState, createContext, useContext } from "react";
+import React, { useEffect, useMemo, useState, createContext, useContext, useCallback } from "react";
 import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 
 /* ===================================================================
@@ -539,6 +539,7 @@ function Register({ role }) {
 
 /* ===================================================================
    Seller Dashboard (uses mailer endpoints)
+   - refreshInvites wrapped in useCallback -> included in useEffect deps
    =================================================================== */
 function SellerDashboard() {
   const { account, setAccount } = useAuth();
@@ -554,7 +555,7 @@ function SellerDashboard() {
 
   useEffect(() => { api.listProjects().then(setProjects); }, []);
 
-  const refreshInvites = async () => {
+  const refreshInvites = useCallback(async () => {
     if (!account) return;
     setLoadingInvites(true);
     try {
@@ -566,9 +567,9 @@ function SellerDashboard() {
     } finally {
       setLoadingInvites(false);
     }
-  };
+  }, [account]);
 
-  useEffect(()=> { if (account) refreshInvites(); }, [account]);
+  useEffect(()=> { if (account) refreshInvites(); }, [account, refreshInvites]);
 
   const save = async (e) => {
     e.preventDefault();
@@ -770,6 +771,7 @@ function Admin() {
       const { invite: updated } = await api.offerInvite(id, price, note, true); // sendEmail:true
       // update invites list locally
       await refreshInvites(project.id);
+      await reload();
       alert(`Offer sent to ${updated.sellerName}`);
     } catch (e) {
       alert(e.message || "Failed to send offer");
@@ -875,6 +877,32 @@ function Admin() {
 
         </div>
       ))}
+
+      {/* Outbox table (using outbox state so it's not unused) */}
+      <div className="card" style={{marginTop:16}}>
+        <div className="row" style={{alignItems:"center"}}>
+          <h3 style={{margin:0}}>Admin Outbox (email simulation)</h3>
+          <span className="right"/>
+          <button className="btn ghost" onClick={async ()=>{ await api.clearOutbox(); setOutbox([]); }}>Clear</button>
+        </div>
+
+        {!outbox.length && <p className="muted">No emails yet.</p>}
+        {!!outbox.length && (
+          <table className="table">
+            <thead><tr><th>When</th><th>To</th><th>Subject</th><th>Body</th></tr></thead>
+            <tbody>
+              {outbox.map(m => (
+                <tr key={m.id}>
+                  <td>{new Date(m.at).toLocaleString()}</td>
+                  <td>{m.to}</td>
+                  <td>{m.subject}</td>
+                  <td className="muted" style={{whiteSpace:"pre-wrap"}}>{m.body}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
 
     </div>
   );
